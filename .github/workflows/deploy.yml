@@ -1,61 +1,40 @@
-# A deployment template that works out of the box
-# It supports these objectives:
-# - Deploy to Maven (Build Job) [Secrets: MAVEN_USER, MAVEN_PASS]
-# - Deploy to CurseForge (Upload Job) [Secrets: CURSEFORGE_TOKEN]
-# - Deploy to Modrinth (Upload Job) [Secrets: MODRINTH_TOKEN]
+# This workflow will build and upload test artifact
+# Simple workflow with ignoring condition to prevent unneccessary build
+# To download artifact check on job task
 
-name: Deploy
+name: Build Test Artifact
 
 on:
   push:
-    tags:
-      - '[0-9]+.[0-9]+.[0-9]+'
+  pull_request:
 
 jobs:
   build:
+    name: Build and Upload Artifact
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+          - name: Checkout Repository
+            uses: actions/checkout@v4.1.4
+          - name: Gather Gradle properties
+            uses: madhead/read-java-properties@latest
+            id: gradle_properties
+            with:
+                 file: gradle.properties
+                 all: true
 
-      - name: Grant Execute Permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Read gradle.properties
-        uses: BrycensRanch/read-properties-action@v1
-        id: properties
-        with:
-          file: gradle.properties
-          all: true
-
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'zulu'
-          cache: gradle
-
-      - name: Publish to Maven
-        if: steps.properties.outputs.publish_to_maven == 'true' && steps.properties.outputs.publish_to_local_maven == 'true'
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: |
-            publish
-            -P${{ steps.properties.outputs.maven_name }}Username=${{ secrets.MAVEN_USER }}
-            -P${{ steps.properties.outputs.maven_name }}Password=${{ secrets.MAVEN_PASS }}
-
-      - name: Publish to CurseForge
-        if: steps.properties.outputs.publish_to_curseforge == 'true'
-        uses: gradle/gradle-build-action@v2
-        env:
-          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
-        with:
-          arguments: curseforge
-
-      - name: Publish to Modrinth
-        if: steps.properties.outputs.publish_to_modrinth == 'true'
-        uses: gradle/gradle-build-action@v2
-        env:
-          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-        with:
-          arguments: modrinth
+          - name: Grant Execute Permission for gradlew
+            run: chmod +x ./gradlew
+          - name: Setup Java
+            uses: actions/setup-java@v4.2.1
+            with:
+              java-version: '17'
+              distribution: 'zulu'
+              cache: gradle
+          - name: Build
+            run: ./gradlew build
+          - name: Upload Build Artifacts
+            uses: actions/upload-artifact@v4.3.3
+            with:
+              name: CurseforgeMod-snapshot-${{ github.run_number}}
+              path: build/libs
