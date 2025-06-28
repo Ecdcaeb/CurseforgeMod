@@ -30,7 +30,7 @@ public class CurseForge {
 
     @Mod.EventHandler
     public void buildEnchantments(FMLLoadCompleteEvent event) {
-        CURES_ENCHANTMENTS = ForgeRegistries.ENCHANTMENTS.getValuesCollection().stream().filter(Enchantment::isCurse).collect(Collectors.toList());
+        CURES_ENCHANTMENTS = ForgeRegistries.ENCHANTMENTS.getValuesCollection().stream().filter(CurseForge::isCursedEnchantment).collect(Collectors.toList());
     }
 
     public static boolean isCursedEnchantment(Enchantment ench) {
