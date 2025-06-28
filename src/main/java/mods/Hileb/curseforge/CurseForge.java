@@ -33,6 +33,10 @@ public class CurseForge {
         CURES_ENCHANTMENTS = ForgeRegistries.ENCHANTMENTS.getValuesCollection().stream().filter(Enchantment::isCurse).collect(Collectors.toList());
     }
 
+    public static boolean isCursedEnchantment(Enchantment ench) {
+        return ench.isCurse() || "ivrench".equals(ench.getRegistryName().resourceDomain());
+    }
+
     public static Enchantment getCursedEnchantment(ItemStack stack) {
         int totalWeight = 0;
         for (Enchantment enchant : CURES_ENCHANTMENTS) {
