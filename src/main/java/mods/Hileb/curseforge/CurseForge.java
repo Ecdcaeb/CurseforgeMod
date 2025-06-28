@@ -34,7 +34,7 @@ public class CurseForge {
     }
 
     public static boolean isCursedEnchantment(Enchantment ench) {
-        return ench.isCurse() || "ivrench".equals(ench.getRegistryName().getResourceDomain());
+        return ench.isCurse() || "ivrench".equals(ench.getRegistryName().getNamespace());
     }
 
     public static Enchantment getCursedEnchantment(ItemStack stack) {
