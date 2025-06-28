@@ -20,7 +20,7 @@ import org.apache.commons.lang3.RandomUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Mod(modid = Tags.MOD_ID, name = Tags.MOD_NAME, version = Tags.VERSION)
+@Mod(modid = Tags.MOD_ID, name = Tags.MOD_NAME, version = Tags.VERSION, acceptableRemoteVersions = "*")
 @Mod.EventBusSubscriber
 @Config(modid = Tags.MOD_ID)
 public class CurseForge {
