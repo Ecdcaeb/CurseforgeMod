@@ -51,7 +51,7 @@ public class CurseForge {
         int cumulativeWeight = 0;
 
         for (Enchantment enchant : CURES_ENCHANTMENTS) {
-            if (enchant.canApply(stack)) {
+            if (enchant.canApply(stack) && !isEnchantmentBlocked(enchant)) {
                 cumulativeWeight += enchant.getRarity().getWeight();
                 if (randomValue < cumulativeWeight) {
                     return enchant;
