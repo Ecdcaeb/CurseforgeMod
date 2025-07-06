@@ -34,7 +34,7 @@ public class CurseForge {
     }
 
     public static boolean isCursedEnchantment(Enchantment ench) {
-        return ench.isCurse() || "ivrench".equals(ench.getRegistryName().getNamespace());
+        return ench != null && (ench.isCurse() || "ivrench".equals(ench.getRegistryName().getNamespace()));
     }
 
     public static Enchantment getCursedEnchantment(ItemStack stack) {
@@ -64,13 +64,15 @@ public class CurseForge {
 
     @SubscribeEvent
     public static void onForge(AnvilRepairEvent event) {
+        ItemStack result = event.getItemResult();
+        if (result.isEmpty()) return;
+        
         if ((!onlyEnchant) || event.getIngredientInput().isItemEnchanted()) {
             double chance = curseForgeChance;
-            ItemStack result = event.getItemResult();
             if (addChance && result.hasTagCompound() && result.getTagCompound().hasKey(Tags.MOD_ID, Constants.NBT.TAG_COMPOUND) && result.getSubCompound(Tags.MOD_ID).hasKey("extra_chance", Constants.NBT.TAG_DOUBLE)) {
                 chance += result.getSubCompound(Tags.MOD_ID).getDouble("extra_chance");
             }
-            if (RandomUtils.nextDouble() < chance) {
+            if (RandomUtils.nextDouble(0, 1) < chance) {
                 Enchantment enchantment = getCursedEnchantment(event.getItemResult());
                 if (enchantment != null) {
                     if (event.getItemResult().isItemEnchanted()) {
@@ -108,7 +110,7 @@ public class CurseForge {
     @Config.Comment("the chance of applying curse enchantment when enchant item thought anvil (Or see onlyEnchant)")
     @Config.RangeDouble(min = 0, max = 1)
     @Config.SlidingOption
-    public static double curseForgeChance = 0.1f;
+    public static double curseForgeChance = 0.1;
 
     @Config.Comment("Only try to applying curse when enchant, or false for every anvil using, include repair and rename")
     public static boolean onlyEnchant = true;
@@ -135,6 +137,7 @@ public class CurseForge {
     public static boolean isEnchantmentBlocked(Enchantment enchantment) {
         if (blockedEnchantments.hashCode() != blockedEnchantments_hash) {
             blockedEnchantments_set = Sets.newHashSet(Arrays.stream(blockedEnchantments).iterator());
+            blockedEnchantments_hash = blockedEnchantments.hashCode();
         }
         return blockedEnchantments_set.contains(enchantment.getRegistryName().toString());
     }
